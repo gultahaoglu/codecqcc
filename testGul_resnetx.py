@@ -1,30 +1,4 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Mon Sep  9 23:48:02 2024
 
-@author: ADMIN
-"""
-
-# -*- coding: utf-8 -*-
-"""
-Created on Wed Aug 28 09:39:36 2024
-
-@author: ADMIN
-"""
-
-# -*- coding: utf-8 -*-
-"""
-Created on Wed Aug 28 09:39:05 2024
-
-@author: ADMIN
-"""
-
-# -*- coding: utf-8 -*-
-"""
-Created on Tue Aug 13 09:59:24 2024
-
-@author: ADMIN
-"""
 import data_utilsTest3
 import argparse
 import os
@@ -51,8 +25,6 @@ def test_model(feat_model_path, loss_model_path, part, add_loss, device):
     model = torch.load(feat_model_path, map_location="cuda")
     model = model.to(device)
     loss_model = torch.load(loss_model_path) # if add_loss != "ocsoftmax" else None
-    # test_set = ASVspoof2019("LA", "./featuresLFCC","E:/POST/DeepFakeAudio/DATASETLER/ASV2019/LA/ASVspoof2019_LA_cm_protocols",part,"LFCC", feat_len=750, padding="repeat")
-    # testDataLoader = DataLoader(test_set, batch_size=16, shuffle=False, num_workers=0,collate_fn=test_set.collate_fn)
    
     
     is_logical='True'
@@ -194,7 +166,7 @@ if __name__ == "__main__":
     args.cuda = torch.cuda.is_available()
     print('Cuda device available: ', args.cuda)
     args.device = torch.device("cuda" if args.cuda else "cpu")
-    scoreFile="E:\\POST\\DeepFakeAudio\\DATASETLER\\ASV2019\\LA\\ASVspoof2019_LA_asv_scores\\ASVspoof2019.LA.asv.eval.gi.trl.scores.txt"
+    scoreFile="../LA/ASVspoof2019_LA_asv_scores/ASVspoof2019.LA.asv.eval.gi.trl.scores.txt"
    
     #eer_cm, min_tDCF = compute_eer_and_tdcf(os.path.join(args.model_dir, 'checkpoint_cm_score.txt'),scoreFile)
 
