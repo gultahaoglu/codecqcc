@@ -35,7 +35,7 @@ def initParams():
 
     # Data folder prepare
     parser.add_argument("-a", "--access_type", type=str, help="LA or PA", default='LA')
-    parser.add_argument("-p", "--path_to_protocol", type=str, help="protocol path",default='E:\POST\DeepFakeAudio\DATASETLER\ASV2019\LA\ASVspoof2019_LA_cm_protocols')
+    parser.add_argument("-p", "--path_to_protocol", type=str, help="protocol path",default='..\LA\ASVspoof2019_LA_cm_protocols')
     parser.add_argument("-o", "--out_fold", type=str, help="output folder", required=False, default='models_4x64_SE_SA')
 
     # Dataset prepare
