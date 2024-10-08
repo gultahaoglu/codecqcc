@@ -11,7 +11,7 @@ import torch.nn.functional as F
 from collections import OrderedDict
 
 class SEBlock(nn.Module):
-    """Squeeze-and-Excitation Block for channel-wise attention."""
+    """Kanal bazlı dikkat için Sıkıştırma ve Uyarım Bloğu."""
     def __init__(self, in_channels, reduction=16):
         super(SEBlock, self).__init__()
         self.fc1 = nn.Linear(in_channels, in_channels // reduction, bias=False)
@@ -48,13 +48,14 @@ class BasicBlock_C(nn.Module):
             )
         self.bn0 = nn.BatchNorm2d(self.expansion * inner_width)
         
-        # Squeeze-and-Excitation layer
+        # Sıkıştırma ve Uyarım katmanı
         self.se = SEBlock(inner_width * self.expansion) if use_se else nn.Identity()
 
     def forward(self, x):
         out = self.basic(x)
-        out = self.se(out)  # Apply the SE block
-        out += self.shortcut(x)
+        residual = self.shortcut(x)
+        out += residual
+        out = self.se(out)  # SE bloğunu kısayol eklemesinden sonra uygula
         out = F.relu(self.bn0(out))
         return out
 
@@ -73,7 +74,7 @@ class ResNeXt(nn.Module):
         self.layer2 = self._make_layer(num_blocks[1], 2)
         self.layer3 = self._make_layer(num_blocks[2], 2)
         self.layer4 = self._make_layer(num_blocks[3], 2)
-        self.pool1 = nn.AdaptiveAvgPool2d((1, 1))  # Adaptive Pooling to ensure flattening works
+        self.pool1 = nn.AdaptiveAvgPool2d((1, 1))  # Düzleştirme için adaptif havuzlama
         
         self.linear = nn.Linear(self.cardinality * self.bottleneck_width * self.expansion // 2, 256)
         self.fc_mu = nn.Linear(256, num_classes) 
@@ -85,9 +86,9 @@ class ResNeXt(nn.Module):
         out = self.layer2(out)
         out = self.layer3(out)
         out = self.layer4(out)
-        out = self.pool1(out)  # This should reduce to (batch_size, channels, 1, 1)
-        out = out.view(out.size(0), -1)  # Flatten to (batch_size, channels)
-        out = self.linear(out)  # Linear layer for classification
+        out = self.pool1(out)  # (batch_size, channels, 1, 1) boyutuna indirger
+        out = out.view(out.size(0), -1)  # (batch_size, channels) boyutunda düzleştir
+        out = self.linear(out)  # Sınıflandırma için doğrusal katman
         mu = self.fc_mu(out)
         return out, mu
 
@@ -100,11 +101,11 @@ class ResNeXt(nn.Module):
         self.bottleneck_width *= 2
         return nn.Sequential(*layers)
 
-# Example usage:
+# Örnek kullanım:
 # def resnext26_16x8d(num_classes=2):
 #     return ResNeXt(num_blocks=[2, 2, 2, 2], cardinality=16, bottleneck_width=8, num_classes=num_classes)
 
-# Testing with the provided input shape
+# Verilen giriş şekliyle test etme
 # net = resnext26_16x8d(num_classes=2)
 # data = torch.rand(16, 1, 60, 750)
 # output = net(data)
