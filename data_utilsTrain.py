@@ -12,8 +12,8 @@ import numpy as np
 from joblib import Parallel, delayed
 import h5py
 
-LOGICAL_DATA_ROOT = '../LA/'
-PHISYCAL_DATA_ROOT = '../PA/'
+LOGICAL_DATA_ROOT = '../PA'
+PHISYCAL_DATA_ROOT = '../PA'
 
 ASVFile = collections.namedtuple('ASVFile',
     ['speaker_id', 'file_name', 'path', 'sys_id', 'key'])
@@ -22,17 +22,19 @@ class ASVDataset(Dataset):
     """ Utility class to load  train/dev datatsets """
     def __init__(self, transform=None, 
         is_train=True, sample_size=None, 
-        is_logical=True, feature_name=None, is_eval=False,
+        is_logical=False, feature_name=None, is_eval=False,
         eval_part=0):
         if is_logical:
             data_root = LOGICAL_DATA_ROOT
-            track = 'LA'
+            track = 'PA'
         else:
             data_root = PHISYCAL_DATA_ROOT
             track = 'PA'
         if is_eval:
             data_root = os.path.join('eval_data', data_root)
+            
         assert feature_name is not None, 'must provide feature name'
+       
         self.track = track
         self.is_logical = is_logical
         self.prefix = 'ASVspoof2019_{}'.format(track)
@@ -48,22 +50,22 @@ class ASVDataset(Dataset):
             'VC_1': 5, # Voice conversion using neural networks
             'VC_4': 6, # transform function-based voice conversion
             # For PA:
-             'AA':7,
-             'AB':8,
-             'AC':9,
-             'BA':10,
-             'BB':11,
-             'BC':12,
-             'CA':13,
-             'CB':14,
-             'CC': 15
+            'AA':7,
+            'AB':8,
+            'AC':9,
+            'BA':10,
+            'BB':11,
+            'BC':12,
+            'CA':13,
+            'CB':14,
+            'CC': 15
             #For LA: 
-            #'A01':7,
-            #'A02':8,
-            #'A03':9,
-            #'A04':10,
-            #'A05':11,
-            #'A06':12
+            # 'A01':7,
+            # 'A02':8,
+            # 'A03':9,
+            # 'A04':10,
+            # 'A05':11,
+            # 'A06':12
 
             
         }
@@ -84,12 +86,13 @@ class ASVDataset(Dataset):
             self.dset_name, '_part{}'.format(eval_part) if is_eval else '',
              track, feature_name)
         self.transform = transform
+      
         if os.path.exists(self.cache_fname):
             self.data_x, self.data_y, self.data_sysid, self.files_meta = torch.load(self.cache_fname)
             print('Dataset loaded from cache ', self.cache_fname)
         elif feature_name == 'cqcc':
+            
             if os.path.exists(self.cache_matlab_fname):
-               
                 self.data_x, self.data_y, self.data_sysid = self.read_matlab_cache(self.cache_matlab_fname)
                 self.files_meta = self.parse_protocols_file(self.protocols_fname)
                 print('Dataset loaded from matlab cache ', self.cache_matlab_fname)
@@ -104,7 +107,7 @@ class ASVDataset(Dataset):
             self.data_x, self.data_y, self.data_sysid = map(list, zip(*data))
           
             if self.transform:
-                # self.data_x = list(map(self.transform, self.data_x)) 
+                self.data_x = list(map(self.transform, self.data_x)) 
                 self.data_x = Parallel(n_jobs=4, prefer='threads')(delayed(self.transform)(x) for x in self.data_x)
             torch.save((self.data_x, self.data_y, self.data_sysid, self.files_meta), self.cache_fname)
             print('Dataset saved to cache ', self.cache_fname)
@@ -170,7 +173,7 @@ class ASVDataset(Dataset):
             sys_id.append(int(list(temp)[0][0]))
         data_x = np.array(data_x)
         data_y = np.array(data_y)
-        breakpoint()
+     
         return data_x.astype(np.float32), data_y.astype(np.int64), sys_id
 
 
