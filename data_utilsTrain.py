@@ -48,22 +48,22 @@ class ASVDataset(Dataset):
             'VC_1': 5, # Voice conversion using neural networks
             'VC_4': 6, # transform function-based voice conversion
             # For PA:
-            # 'AA':7,
-            # 'AB':8,
-            # 'AC':9,
-            # 'BA':10,
-            # 'BB':11,
-            # 'BC':12,
-            # 'CA':13,
-            # 'CB':14,
-            # 'CC': 15
+             'AA':7,
+             'AB':8,
+             'AC':9,
+             'BA':10,
+             'BB':11,
+             'BC':12,
+             'CA':13,
+             'CB':14,
+             'CC': 15
             #For LA: 
-            'A01':7,
-            'A02':8,
-            'A03':9,
-            'A04':10,
-            'A05':11,
-            'A06':12
+            #'A01':7,
+            #'A02':8,
+            #'A03':9,
+            #'A04':10,
+            #'A05':11,
+            #'A06':12
 
             
         }
